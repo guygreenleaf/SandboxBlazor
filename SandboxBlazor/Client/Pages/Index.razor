@@ -1,0 +1,113 @@
+﻿@page "/"
+@inject IWineBottleService WineBottleService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Ambatakum / AmBussing</h1>
+
+
+<button class="form-input" onclick="@(() => FirstClick())">First Api Call</button>
+
+
+
+
+<hr />
+
+<EditForm Model="@newWineBottle" OnValidSubmit="@InsertWineBottle">
+    <InputText id="SKU" @bind-Value="newWineBottle.SKU" />
+    <br />
+    <InputText id="BrandName" @bind-Value="newWineBottle.BrandName" />
+    <br />
+    <InputNumber id="CostPerBottle" @bind-Value="newWineBottle.CostPerBottle" />
+    <br />
+    <button class="form-input" type="submit">Second Api Call (insert)</button>
+</EditForm>
+
+<hr />
+
+
+
+
+@if (WineBottles is null)
+{
+    <p><em>No Bottles Loaded</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>SKU</th>
+                <th>Brand Name</th>
+                <th>Cost / Bottle</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(WineBottle bottle in WineBottles)
+            {
+                <tr>
+                    <td>@bottle.WineBottleID</td>
+                    <td>@bottle.SKU</td>
+                    <td>@bottle.BrandName</td>
+                    <td>@bottle.CostPerBottle</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+
+
+@code{
+
+    private List<WineBottle>? WineBottles { get; set; }
+
+    private WineBottle newWineBottle = new();
+
+    private async void FirstClick()
+    {
+        try
+        {
+            var response = await WineBottleService.GetAllWineBottles();
+
+
+            if(response is not null){
+                WineBottles = response;
+            }
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex.Message);
+        }
+
+    }
+
+    private async void SecondClick() 
+    {
+        try
+        {
+            //var response = await _secondClient.GetSecondApiCall();
+
+            //if (response is not null && response.IsSuccessStatusCode)
+            //{
+            //    Console.WriteLine(response);
+            //}
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex.Message);
+
+        }
+    }
+
+    private async void InsertWineBottle(){
+        var res = await WineBottleService.InsertWineBottle(newWineBottle);
+    }
+}
